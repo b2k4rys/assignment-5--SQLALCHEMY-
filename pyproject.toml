@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "assignment-5 (sqlalchemy)"
+version = "0.1.0"
+description = ""
+authors = ["Bekarys <bekarys20050812@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = {extras = ["standard"], version = "^0.112.1"}
+sqlalchemy = "^2.0.32"
+psycopg2 = "^2.9.9"
+pyjwt = "^2.9.0"
+attrs = "^24.2.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
