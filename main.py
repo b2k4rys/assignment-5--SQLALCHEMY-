@@ -10,6 +10,7 @@ from typing import Literal
 from sqlalchemy.orm import sessionmaker
 import jwt
 import json
+from sqlalchemy import inspect
 
 app = FastAPI()
 models.Base.metadata.create_all(bind=engine)
@@ -77,19 +78,30 @@ async def delete_flower(flower_id: int):
   db.commit()
   return {"message": "Item deleted successfully"}
 
+
+
 @app.post('/cart/items')
 async def add_flower(response: Response, flower_id: int = Form(), items: str = Cookie(default='[]'), price: int = Cookie(default=0)):
   db = SessionLocal()
   items_json = json.loads(items)
   flower = db.query(models.Flower).filter(models.Flower.id == flower_id).first()
+
+  def object_as_dict(obj):
+    return {
+        c.key: getattr(obj, c.key)
+        for c in inspect(obj).mapper.column_attrs
+    }
+  d = object_as_dict(flower)
+
+  
   if flower:
-      # items_json.append(asdict(flower))
-      # price += flower.price
-      # new_items = json.dumps(items_json)
-      # response.set_cookie(key='items', value=new_items)
-      # response.set_cookie(key='price', value=price)
-      # return response.status_code
-      return type(flower)
+      items_json.append(d)
+      price += d['price']
+      new_items = json.dumps(items_json)
+      response.set_cookie(key='items', value=new_items)
+      response.set_cookie(key='price', value=price)
+      return {'items': items_json,'price': price}
+
   else:
     raise HTTPException(status_code=404, detail="Item not found")
 
